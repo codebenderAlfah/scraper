@@ -17,7 +17,7 @@ public class amazon {
             XSSFSheet sheet = workbook.createSheet("Productbook");
 
 
-            String url = "https://www.amazon.com/s?i=specialty-aps&bbn=16225007011&rh=n%3A16225007011%2Cn%3A1292115011&ref=nav_em__nav_desktop_sa_intl_monitors_0_2_6_8";
+            String url = "https://www.amazon.com/s?i=fashion-mens-intl-ship&bbn=16225019011&rh=n%3A16225019011%2Cn%3A2474937011%2Cn%3A2474947011&dc&ds=v1%3AoXZ7iZ9W%2Fp1tQWUe7aB0nslxBojroKnwqRL6eajd9b8&qid=1662124329&rnid=2474937011&ref=sr_nr_n_1";
             Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
             Page page = browser.newPage();
             //Page n[] = new Page[100];
@@ -32,10 +32,14 @@ public class amazon {
                 String productLongDescription2Xp = "//div[@id='prodDetails']";
                 String productLongDescription3Xp = "//div[@id='detailBullets_feature_div']";
                 String imageXp = "//div[@id='imgTagWrapperId']";
-                String img1 = "(//div[@class='ivThumbImage'])[3]";
-                String img2 = "(//div[@class='ivThumbImage'])[4]";
-                String img3 = "(//div[@class='ivThumbImage'])[5]";
-                String fullImageXp = "//img[@class='fullscreen']";
+                String imgType1 = "(//div[@class='ivThumbImage'])[3]";
+                String imgType2 = "(//div[@class='ivThumbImage'])[4]";
+                String imgType3 = "(//div[@class='ivThumbImage'])[5]";
+                String imgTypeA = "(//span[@class='a-button-inner'])[3]";
+                String imgTypeB = "(//span[@class='a-button-inner'])[4]";
+                String imgTypeC = "(//span[@class='a-button-inner'])[5]";
+                String fullImageType1Xp = "//img[@class='fullscreen']";
+                String image1xp = "//img[@class='a-dynamic-image']";
                 page.click(productListXp);
                 String productPrice = "";
                 String productLongDescription = "";
@@ -75,9 +79,11 @@ public class amazon {
                     if (productLongDescription.length() > 30000 && page.isVisible(productLongDescription2Xp)){
                         productLongDescription = page.innerHTML(productLongDescription2Xp);
                         System.out.println("des2");
+                        System.out.println(productLongDescription.length());
                     } else if (productLongDescription.length() > 30000 && page.isVisible(productLongDescription3Xp)) {
                         productLongDescription = page.innerHTML(productLongDescription3Xp);
                         System.out.println("des3");
+                        System.out.println(productLongDescription.length());
                     }
                 } else if (page.isVisible(productLongDescription2Xp)) {
                     productLongDescription = page.innerHTML(productLongDescription2Xp);
@@ -90,15 +96,27 @@ public class amazon {
 
                 page.click(imageXp);
                 page.waitForLoadState();
-                page.click(img1);
-                page.waitForLoadState();
-                img1Url = page.getAttribute(fullImageXp, "src");
-                page.click(img2);
-                page.waitForLoadState();
-                img2Url = page.getAttribute(fullImageXp, "src");
-                page.click(img3);
-                page.waitForLoadState();
-                img3Url = page.getAttribute(fullImageXp, "src");
+                if(page.isVisible(imgType1)){
+                    page.click(imgType1);
+                    page.waitForLoadState();
+                    img1Url = page.getAttribute(fullImageType1Xp, "src");
+                    page.click(imgType2);
+                    page.waitForLoadState();
+                    img2Url = page.getAttribute(fullImageType1Xp, "src");
+                    page.click(imgType3);
+                    page.waitForLoadState();
+                    img3Url = page.getAttribute(fullImageType1Xp, "src");
+                } else {
+                    page.click(imgTypeA);
+                    page.waitForLoadState();
+                    img1Url = page.getAttribute(image1xp, "src");
+                    page.click(imgTypeB);
+                    page.waitForLoadState();
+                    img2Url = page.getAttribute(image1xp, "src");
+                    page.click(imgTypeC);
+                    page.waitForLoadState();
+                    img3Url = page.getAttribute(image1xp, "src");
+                }
                 System.out.println(img1Url);
                 System.out.println(img2Url);
                 System.out.println(img3Url);

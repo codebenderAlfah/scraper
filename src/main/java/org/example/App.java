@@ -21,7 +21,7 @@ public class App {
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet sheet = workbook.createSheet("Productbook");
 
-            String url = "https://www.aliexpress.com/category/200216551/gaming-laptops.html?spm=a2g0o.home.104.11.7e0f2145sjUlg2";
+            String url = "https://www.aliexpress.com/category/711005/usb-flash-drives.html?spm=a2g0o.home.104.25.445b2145m5VuaA";
             Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
             BrowserContext browserContext = browser.newContext();
             Page page = browserContext.newPage();
@@ -30,7 +30,7 @@ public class App {
             String productPricexp = "//span[@class = 'product-price-value']";
             String productDescriptionxp = "//div[@class = 'product-specs']";
             //page.navigate(url);
-            for (int i = 1; i < 3; i++) {
+            for (int i = 1; i < 41; i++) {
                 page.navigate(url);
                 String product = "(//h1[@class = '_18_85'])[" + i + "]";
                 page.click(product);
@@ -43,41 +43,64 @@ public class App {
 //                String dummy = n[i].innerText(productPricexp);
                 n[i].waitForLoadState();
 
+                String price;
+
                 if(!n[i].isVisible(productPricexp)){
                     System.out.println("product price does not exist");
-                    n[i].close();
-                    continue;
+                    int min, max;
+                    min = 300; max = 900;
+                    int b = (int)(Math.random()*(max-min+1)+min);
+                    price = String.valueOf(b);
+
+                }else{
+                    price = n[i].innerText(productPricexp);
                 }
 
 
 
                 String productTitle = n[i].innerText(productNamexp);
                 System.out.println(productTitle);
-                String price = n[i].innerText(productPricexp);
+
                 System.out.println(price);
                 n[i].locator("(//span[@class='tab-inner-text'])[7]").click();
                 String productDescription = n[i].innerHTML(productDescriptionxp);
                 System.out.println(productDescription);
-                if(price.length()>6){
-                    price = price.substring(0, price.length()-6);
-                }
-                int productPrice = Integer.parseInt(price.replaceAll("[^0-9]", ""));
+                Long productPrice = Long.parseLong(price.replaceAll("[^0-9]", ""));
+
+
                 String SEName = productTitle.replaceAll("[^a-zA-Z0-9]", "-");
                 String currLink = n[i].url();
                 String skuInLink = currLink.substring(currLink.lastIndexOf("/") + 1,currLink.lastIndexOf("/") + 11 );
                 long SKU = Long.parseLong(skuInLink);
                 String productShortDescription = productTitle;
+//                  String img1 = "//div[@class='images-view-item']";
+//                String img1 = "(//div[@class='images-view-item']/img)[2]";
+//                String img2 = "(//div[@class='images-view-item']/img)[3]";
+//                String img3 = "(//div[@class='images-view-item']/img)[4]";
+//                String imgURL = "//img[@class='magnifier-image']";
+
                 String img1 = "(//div[@class='images-view-item']/img)[2]";
                 String img2 = "(//div[@class='images-view-item']/img)[3]";
                 String img3 = "(//div[@class='images-view-item']/img)[4]";
                 String imgURL = "//img[@class='magnifier-image']";
+                String img1URL,img2URL,img3URL;
 
-                n[i].locator(img1).click();
-                String img1URL = n[i].getAttribute(imgURL, "src");
-                n[i].locator(img2).click();
-                String img2URL = n[i].getAttribute(imgURL, "src");
-                n[i].locator(img3).click();
-                String img3URL = n[i].getAttribute(imgURL, "src");
+                if (!n[i].isVisible(img1)){
+                    img1 = "(//div[@class='images-view-item']/img)[1]";
+                    n[i].locator(img1).click();
+                    img1URL = n[i].getAttribute(imgURL, "src");
+                    img2URL = "";
+                    img3URL = "";
+                }
+                else {
+                    n[i].locator(img1).click();
+                    img1URL = n[i].getAttribute(imgURL, "src");
+                    n[i].locator(img2).click();
+                    img2URL = n[i].getAttribute(imgURL, "src");
+                    n[i].locator(img3).click();
+                    img3URL = n[i].getAttribute(imgURL, "src");
+                }
+
                 System.out.println(img1URL);
                 System.out.println(img2URL);
                 System.out.println(img3URL);
@@ -88,8 +111,11 @@ public class App {
                 System.out.println(productShortDescription);
 
                 Object[][] pro = {
-                        {productTitle, productPrice, SEName, SKU, productShortDescription, productDescription, img1URL, img2URL, img3URL}
+                        { "Simple Product",0, "TRUE" ,productTitle, productShortDescription, productDescription,"", "Simple product", "FALSE", 0,"","","",SEName, "TRUE", "TRUE", SKU, productPrice, img1URL, img2URL, img3URL}
                 };
+//                Object[][] pro = {
+//                        { "Simple Product",0, "TRUE" ,productTitle, productShortDescription, productDescription,"", "Simple product", "FALSE", 0,"","","",SEName, "TRUE", "TRUE", SKU, productPrice, img1URL}
+//                };
                 int rowNum = i;
                 for (Object[] proRow : pro) {
                     Row row = sheet.createRow(rowNum++);

@@ -10,7 +10,7 @@ import com.github.javafaker.Faker;
 public class bestBuy {
     public static void main(String[] args) {
         Faker faker = new Faker();
-        String des = faker.harryPotter().quote();
+        String des = faker.animal().name();
         System.out.println(des);
 
 
