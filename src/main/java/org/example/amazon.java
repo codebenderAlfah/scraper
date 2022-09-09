@@ -8,26 +8,32 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class amazon {
     public static void main(String[] args) throws IOException, InterruptedException {
+        int n;
+        Scanner scan = new Scanner(System.in);
+        System.out.print("Input: ");
+        n = scan.nextInt();
         try (Playwright playwright = Playwright.create()) {
 
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet sheet = workbook.createSheet("Productbook");
 
 
-            String url = "https://www.amazon.com/s?i=fashion-mens-intl-ship&bbn=16225019011&rh=n%3A16225019011%2Cn%3A2474937011%2Cn%3A2474947011&dc&ds=v1%3AoXZ7iZ9W%2Fp1tQWUe7aB0nslxBojroKnwqRL6eajd9b8&qid=1662124329&rnid=2474937011&ref=sr_nr_n_1";
+            String url = "https://www.amazon.com/s?k=water+bottles&i=sporting&rh=n%3A3394801%2Cn%3A3395091&dc&page=3&qid=1662370050&rnid=2941120011&sprefix=water+%2Caps%2C477&ref=sr_pg_3";
             Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
             Page page = browser.newPage();
             //Page n[] = new Page[100];
-            for(int i = 1; i<=20; i++) {
+            for(int i = 1; i<=n; i++) {
                 page.navigate(url);
                 String productListXp = "(//span[contains(@class, 'a-size-base-plus')])[" + i + "]";
                 String productNameXp = "//h1[@id= 'title']";
                 String productPriceType1Xp = "//span[@class = 'a-price aok-align-center reinventPricePriceToPayMargin priceToPay']";
                 String productPriceType2Xp = "//span[@class = 'a-price a-text-price a-size-medium apexPriceToPay']";
                 String productShortDescriptionXp = "//ul[@class='a-unordered-list a-vertical a-spacing-mini']";
+                String productShortDescriptionXp2 = "//div[@id='feature-bullets']";
                 String productLongDescription1Xp = "//div[@id='aplus']";
                 String productLongDescription2Xp = "//div[@id='prodDetails']";
                 String productLongDescription3Xp = "//div[@id='detailBullets_feature_div']";
@@ -44,6 +50,7 @@ public class amazon {
                 String productPrice = "";
                 String productLongDescription = "";
                 String img1Url, img2Url, img3Url;
+                String productShortDescription = "";
                 //page.waitForLoadState();
                 String productName = page.innerText(productNameXp);
                 if (page.isVisible(productPriceType1Xp)) {
@@ -56,9 +63,9 @@ public class amazon {
                     productPrice = productPrice.substring(1,productPrice.indexOf("\n"));
                     productPrice = productPrice.replaceAll("[^0-9.]", "");
 //                    System.out.println(productName + " " + productPrice);
-                } else if(page.isVisible(productPriceType1Xp) || page.isVisible(productPriceType2Xp)){
+                } else {
                     int min, max;
-                    min = 300; max = 900;
+                    min = 60; max = 120;
                     int b = (int)(Math.random()*(max-min+1)+min);
                     productPrice = String.valueOf(b);
                 }
@@ -69,8 +76,15 @@ public class amazon {
                 System.out.println(SEName);
                 String SKU = currlink.substring(currlink.indexOf("dp/")+3, currlink.indexOf("/ref"));
                 System.out.println(SKU);
-                String productShortDescription = page.innerText(productShortDescriptionXp);
-                System.out.println(productShortDescription);
+
+                if (page.isVisible(productShortDescriptionXp)){
+                    productShortDescription = page.innerText(productShortDescriptionXp);
+                    System.out.println(productShortDescription);
+                } else {
+                    productShortDescription = page.innerText(productShortDescriptionXp2);
+                    System.out.println(productShortDescription);
+                }
+
                 page.waitForLoadState();
                 if (page.isVisible(productLongDescription1Xp)) {
                     productLongDescription = page.innerHTML(productLongDescription1Xp);
@@ -95,26 +109,34 @@ public class amazon {
 //                System.out.println(productLongDescription);
 
                 page.click(imageXp);
-                page.waitForLoadState();
+//                page.waitForLoadState();
                 if(page.isVisible(imgType1)){
+
+                    if (!page.isVisible(imgType1) || !page.isVisible(imgType2) || !page.isVisible(imgType3)){
+                        continue;
+                    }
+
                     page.click(imgType1);
                     page.waitForLoadState();
                     img1Url = page.getAttribute(fullImageType1Xp, "src");
                     page.click(imgType2);
-                    page.waitForLoadState();
+//                    page.waitForLoadState();
                     img2Url = page.getAttribute(fullImageType1Xp, "src");
                     page.click(imgType3);
-                    page.waitForLoadState();
+//                    page.waitForLoadState();
                     img3Url = page.getAttribute(fullImageType1Xp, "src");
                 } else {
+                    if (!page.isVisible(imgTypeA) || !page.isVisible(imgTypeB) || !page.isVisible(imgTypeC)){
+                        continue;
+                    }
                     page.click(imgTypeA);
                     page.waitForLoadState();
                     img1Url = page.getAttribute(image1xp, "src");
                     page.click(imgTypeB);
-                    page.waitForLoadState();
+//                    page.waitForLoadState();
                     img2Url = page.getAttribute(image1xp, "src");
                     page.click(imgTypeC);
-                    page.waitForLoadState();
+//                    page.waitForLoadState();
                     img3Url = page.getAttribute(image1xp, "src");
                 }
                 System.out.println(img1Url);
